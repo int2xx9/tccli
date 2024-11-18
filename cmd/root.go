@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"os"
 
 	internalFormatter "github.com/int2xx9/tccli/internal/formatter"
@@ -9,7 +10,7 @@ import (
 )
 
 var tcapp *teamcity.Client
-var formatter internalFormatter.Formatter = &internalFormatter.JsonFormatter{}
+var formatter internalFormatter.Formatter
 
 var rootCmd = &cobra.Command{
 	Use: "tccli",
@@ -24,8 +25,11 @@ func Execute() {
 
 func init() {
 	rootCmd.PersistentFlags().String("profile", "", "Use a specific profile from your credential file")
-	rootCmd.PersistentFlags().String("server", "", "Use a specific server")
-	rootCmd.PersistentFlags().String("token", "", "Use a specific token")
+	rootCmd.PersistentFlags().String("server", "", "Use a specific server (required)")
+	rootCmd.PersistentFlags().String("token", "", "Use a specific token (required)")
+
+	rootCmd.PersistentFlags().String("output", "json", "Output format (json or csv, default is json)")
+	rootCmd.PersistentFlags().String("csv-format", "", "CSV format (required if output is csv)")
 
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 		if cmd.Use == "config" {
@@ -33,6 +37,25 @@ func init() {
 		}
 
 		var err error
+
+		output, _ := rootCmd.Flags().GetString("output")
+		switch output {
+		case "csv":
+			csvFormat, _ := rootCmd.Flags().GetString("csv-format")
+			if csvFormat == "" {
+				return errors.New("csv-format is required if output is csv")
+			}
+
+			formatter, err = internalFormatter.NewCsvFormatter(csvFormat, true)
+			if err != nil {
+				return err
+			}
+		case "json":
+			formatter = &internalFormatter.JsonFormatter{}
+		default:
+			return errors.New("output must be csv or json")
+		}
+
 		tcapp, err = createTeamcityClient()
 		return err
 	}
