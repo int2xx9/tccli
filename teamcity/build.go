@@ -23,21 +23,21 @@ func (c *Client) GetAllBuilds(locator string, fields string) ([]schema.Build, er
 	return builds.Build, nil
 }
 
-func (c *Client) GetBuild(buildLocator string, fields string) ([]schema.Build, error) {
+func (c *Client) GetBuild(buildLocator string, fields string) (schema.Build, error) {
 	if buildLocator == "" {
-		return nil, ErrEmptyLocator
+		return schema.Build{}, ErrEmptyLocator
 	}
 
-	var builds schema.Builds
+	var build schema.Build
 	queries := map[string]string{}
 	if fields != "" {
 		queries["fields"] = fields
 	}
-	err := c.getJson("/app/rest/builds/"+url.QueryEscape(buildLocator), queries, nil, &builds)
+	err := c.getJson("/app/rest/builds/"+url.QueryEscape(buildLocator), queries, nil, &build)
 	if err != nil {
-		return nil, err
+		return schema.Build{}, err
 	}
-	return builds.Build, nil
+	return build, nil
 }
 
 func (c *Client) GetBuildTestOccurrences(buildLocator string, fields string) (schema.TestOccurrences, error) {
