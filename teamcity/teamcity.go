@@ -104,3 +104,15 @@ func (c *Client) getJson(path string, queries map[string]string, requestFunc fun
 
 	return json.Unmarshal(bodyBytes, v)
 }
+
+func (c *Client) getBinary(path string, queries map[string]string, requestFunc func(*http.Request)) (io.ReadCloser, error) {
+	response, err := c.get(path, queries, func(r *http.Request) {
+		if requestFunc != nil {
+			requestFunc(r)
+		}
+	})
+	if err != nil {
+		return nil, err
+	}
+	return response.Body, nil
+}

@@ -1,6 +1,7 @@
 package teamcity
 
 import (
+	"io"
 	"net/url"
 
 	"github.com/int2xx9/tccli/teamcity/schema"
@@ -54,4 +55,23 @@ func (c *Client) GetBuildTestOccurrences(locator string, fields string) (schema.
 		return schema.TestOccurrences{}, err
 	}
 	return testOccurrences, nil
+}
+
+func (c *Client) GetBuildArtifactArchive(locator string, path string, archiveLocator string) (io.ReadCloser, error) {
+	if locator == "" {
+		return nil, ErrEmptyLocator
+	}
+
+	if path != "" && path[0] != '/' {
+		path = "/" + path
+	}
+
+	queries := map[string]string{}
+	if archiveLocator != "" {
+		queries["archiveLocator"] = archiveLocator
+	} else {
+		queries["archiveLocator"] = "pattern:*"
+	}
+
+	return c.getBinary("/app/rest/builds/"+url.QueryEscape(locator)+"/artifacts/archived"+path, queries, nil)
 }
