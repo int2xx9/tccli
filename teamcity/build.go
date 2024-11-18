@@ -57,13 +57,9 @@ func (c *Client) GetBuildTestOccurrences(buildLocator string, fields string) (sc
 	return testOccurrences, nil
 }
 
-func (c *Client) GetBuildArtifactArchive(buildLocator string, path string, archiveLocator string) (io.ReadCloser, error) {
+func (c *Client) GetBuildArtifactArchive(buildLocator string, archiveLocator string) (io.ReadCloser, error) {
 	if buildLocator == "" {
 		return nil, ErrEmptyLocator
-	}
-
-	if path != "" && path[0] != '/' {
-		path = "/" + path
 	}
 
 	queries := map[string]string{}
@@ -73,5 +69,5 @@ func (c *Client) GetBuildArtifactArchive(buildLocator string, path string, archi
 		queries["archiveLocator"] = "pattern:*"
 	}
 
-	return c.getBinary("/app/rest/builds/"+url.QueryEscape(buildLocator)+"/artifacts/archived"+path, queries, nil)
+	return c.getBinary("/app/rest/builds/"+url.QueryEscape(buildLocator)+"/artifacts/archived", queries, nil)
 }
