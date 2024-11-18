@@ -9,12 +9,10 @@ import (
 var buildsTestOccurrencesCmd = &cobra.Command{
 	Use: "testOccurrences",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		locator, err := cmd.Flags().GetString("locator")
-		if err != nil {
-			return err
-		}
+		locator, _ := cmd.Flags().GetString("locator")
+		fields, _ := cmd.Flags().GetString("fields")
 
-		resp, err := tcapp.GetBuildTestOccurrences(locator)
+		resp, err := tcapp.GetBuildTestOccurrences(locator, fields)
 		if err != nil {
 			return err
 		}
@@ -33,4 +31,5 @@ func init() {
 	buildsCmd.AddCommand(buildsTestOccurrencesCmd)
 
 	buildsTestOccurrencesCmd.Flags().String("locator", "", "Locator for builds")
+	buildsTestOccurrencesCmd.Flags().String("fields", "", "Fields to include in response")
 }

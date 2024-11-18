@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+var (
+	ErrEmptyLocator = fmt.Errorf("locator is empty")
+)
+
 type Client struct {
 	Server     string
 	Token      string
@@ -22,7 +26,7 @@ func NewClient(server string, token string) *Client {
 	}
 }
 
-func (c *Client) getUrl(path string) (*url.URL, error) {
+func (c *Client) getUrl(path string, queries map[string]string) (*url.URL, error) {
 	parseUrl, err := url.Parse(c.Server)
 	if err != nil {
 		return nil, err
@@ -38,11 +42,17 @@ func (c *Client) getUrl(path string) (*url.URL, error) {
 	newUrl := parseUrl.JoinPath(baseUrl)
 	newUrl.RawQuery = queryString
 
+	query := newUrl.Query()
+	for key, value := range queries {
+		query.Add(key, value)
+	}
+	newUrl.RawQuery = query.Encode()
+
 	return newUrl, nil
 }
 
-func (c *Client) get(path string, requestFunc func(*http.Request)) (*http.Response, error) {
-	requestUrl, err := c.getUrl(path)
+func (c *Client) get(path string, queries map[string]string, requestFunc func(*http.Request)) (*http.Response, error) {
+	requestUrl, err := c.getUrl(path, queries)
 	if err != nil {
 		return nil, err
 	}
@@ -75,8 +85,8 @@ func (c *Client) get(path string, requestFunc func(*http.Request)) (*http.Respon
 	return resp, nil
 }
 
-func (c *Client) getJson(path string, requestFunc func(*http.Request), v any) error {
-	response, err := c.get(path, func(r *http.Request) {
+func (c *Client) getJson(path string, queries map[string]string, requestFunc func(*http.Request), v any) error {
+	response, err := c.get(path, queries, func(r *http.Request) {
 		r.Header.Add("Accept", "application/json")
 		if requestFunc != nil {
 			requestFunc(r)

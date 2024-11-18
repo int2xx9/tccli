@@ -9,12 +9,10 @@ import (
 var buildTypesGetAllCmd = &cobra.Command{
 	Use: "getAll",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		locator, err := cmd.Flags().GetString("locator")
-		if err != nil {
-			return err
-		}
+		locator, _ := cmd.Flags().GetString("locator")
+		fields, _ := cmd.Flags().GetString("fields")
 
-		resp, err := tcapp.GetAllBuildTypes(locator)
+		resp, err := tcapp.GetAllBuildTypes(locator, fields)
 		if err != nil {
 			return err
 		}
@@ -33,4 +31,5 @@ func init() {
 	buildTypesCmd.AddCommand(buildTypesGetAllCmd)
 
 	buildTypesGetAllCmd.Flags().String("locator", "", "Locator for builds")
+	buildTypesGetAllCmd.Flags().String("fields", "", "Fields to include in response")
 }
