@@ -23,8 +23,8 @@ func (c *Client) GetAllBuilds(locator string, fields string) ([]schema.Build, er
 	return builds.Build, nil
 }
 
-func (c *Client) GetBuild(locator string, fields string) ([]schema.Build, error) {
-	if locator == "" {
+func (c *Client) GetBuild(buildLocator string, fields string) ([]schema.Build, error) {
+	if buildLocator == "" {
 		return nil, ErrEmptyLocator
 	}
 
@@ -33,15 +33,15 @@ func (c *Client) GetBuild(locator string, fields string) ([]schema.Build, error)
 	if fields != "" {
 		queries["fields"] = fields
 	}
-	err := c.getJson("/app/rest/builds/"+url.QueryEscape(locator), queries, nil, &builds)
+	err := c.getJson("/app/rest/builds/"+url.QueryEscape(buildLocator), queries, nil, &builds)
 	if err != nil {
 		return nil, err
 	}
 	return builds.Build, nil
 }
 
-func (c *Client) GetBuildTestOccurrences(locator string, fields string) (schema.TestOccurrences, error) {
-	if locator == "" {
+func (c *Client) GetBuildTestOccurrences(buildLocator string, fields string) (schema.TestOccurrences, error) {
+	if buildLocator == "" {
 		return schema.TestOccurrences{}, ErrEmptyLocator
 	}
 
@@ -50,15 +50,15 @@ func (c *Client) GetBuildTestOccurrences(locator string, fields string) (schema.
 	if fields != "" {
 		queries["fields"] = fields
 	}
-	err := c.getJson("/app/rest/builds/"+url.QueryEscape(locator)+"/testOccurrences", queries, nil, &testOccurrences)
+	err := c.getJson("/app/rest/builds/"+url.QueryEscape(buildLocator)+"/testOccurrences", queries, nil, &testOccurrences)
 	if err != nil {
 		return schema.TestOccurrences{}, err
 	}
 	return testOccurrences, nil
 }
 
-func (c *Client) GetBuildArtifactArchive(locator string, path string, archiveLocator string) (io.ReadCloser, error) {
-	if locator == "" {
+func (c *Client) GetBuildArtifactArchive(buildLocator string, path string, archiveLocator string) (io.ReadCloser, error) {
+	if buildLocator == "" {
 		return nil, ErrEmptyLocator
 	}
 
@@ -73,5 +73,5 @@ func (c *Client) GetBuildArtifactArchive(locator string, path string, archiveLoc
 		queries["archiveLocator"] = "pattern:*"
 	}
 
-	return c.getBinary("/app/rest/builds/"+url.QueryEscape(locator)+"/artifacts/archived"+path, queries, nil)
+	return c.getBinary("/app/rest/builds/"+url.QueryEscape(buildLocator)+"/artifacts/archived"+path, queries, nil)
 }

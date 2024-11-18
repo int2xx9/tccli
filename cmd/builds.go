@@ -10,4 +10,6 @@ var buildsCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(buildsCmd)
+
+	buildsCmd.PersistentFlags().String("build-locator", "", "Locator for builds")
 }

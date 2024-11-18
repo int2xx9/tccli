@@ -10,4 +10,6 @@ var buildTypesCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(buildTypesCmd)
+
+	buildTypesCmd.PersistentFlags().String("build-type-locator", "", "Locator for build types")
 }
