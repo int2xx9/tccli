@@ -23,3 +23,12 @@ func (c *Client) GetBuildDetail(id string) (schema.Build, error) {
 	}
 	return build, nil
 }
+
+func (c *Client) GetBuildTestOccurrences(locator string) (schema.TestOccurrences, error) {
+	var testOccurrences schema.TestOccurrences
+	err := c.getJson("/app/rest/builds/"+url.QueryEscape(locator)+"/testOccurrences", nil, &testOccurrences)
+	if err != nil {
+		return schema.TestOccurrences{}, err
+	}
+	return testOccurrences, nil
+}
