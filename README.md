@@ -5,6 +5,12 @@ An extremely limited TeamCity client.
 
 ## Usage
 
+### Install
+
+```sh
+go install github.com/int2xx9/tccli@main
+```
+
 ### Specify a server and authenticate
 You need to pass `--server` and `--token` to use tccli.
 
